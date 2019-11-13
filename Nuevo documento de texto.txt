@@ -1,0 +1,54 @@
+CREATE TABLE proyecto (
+
+id int not null identity(1,1),
+
+nombre varchar(50)
+
+)
+
+
+INSERT INTO proyecto (nombre) VALUES ('proyecto pepito'), ('proyecto argoya'), ('proyectooooo')
+
+
+
+FECHA
+
+LA FECHA MAS UN DIA
+
+SELECT DATEADD(day, 1, '2019-01-01')
+
+
+UN DIA A PARTIR DE HOY
+
+SELECT DATEADD(day, 1, GETDATE())
+
+
+INSERT INTO #semana (fecha) VALUES (DATEADD(day, 1, GETDATE()))
+
+
+CREA TABLA CON PRIMARY KEY
+
+CREATE TABLE Ciudad (
+
+    id_ciudad int NOT NULL,
+
+    nombre varchar(50),
+
+    pais varchar(50),
+
+    Age int,
+
+    CONSTRAINT PK_ID_CIUDAD PRIMARY KEY (id_ciudad)
+
+);
+
+
+CREATE TABLE aeropuerto (
+
+    id char(3) NOT NULL PRIMARY KEY,
+
+    nombre char(100),
+
+    ciudad int FOREIGN KEY REFERENCES Ciudad(id_ciudad)
+
+);
