@@ -52,3 +52,95 @@ CREATE TABLE aeropuerto (
     ciudad int FOREIGN KEY REFERENCES Ciudad(id_ciudad)
 
 );
+
+
+
+
+
+///////////////////////////
+
+
+1.
+CREATE TABLE movimiento (
+mov_numero int not null identity(1,1),
+cue_numero char(2) not null,
+cue_subcuenta char(4) not null,
+mov_debito int,
+mov_credito int,
+mov_descripcion varchar(50),
+mov_fecha datetime,
+
+CONSTRAINT FK_num_suncu
+FOREIGN KEY (cue_numero, cue_subcuenta) REFERENCES cuenta(cue_numero, cue_subcuenta)
+)
+
+CREATE TABLE cuenta (
+cue_numero char(2) not null,
+cue_subcuenta char(4) not null,
+cue_descripcion varchar(50),
+CONSTRAINT PKS PRIMARY KEY (cue_numero, cue_subcuenta)
+)
+
+CREATE TABLE resumen (
+id int not null identity(1,1),
+cue_numero char(2) not null,
+cue_subcuenta char(4) not null,
+res_debito int,
+res_credito int,
+CONSTRAINT FK_num_suncu2
+FOREIGN KEY (cue_numero, cue_subcuenta) REFERENCES cuenta(cue_numero, cue_subcuenta)
+)
+
+CREATE TABLE #fecha (
+id int not null identity(1,1),
+fecha datetime
+)
+
+
+2.
+INSERT INTO cuenta (cue_numero, cue_subcuenta, cue_descripcion) VALUES ('AA', 'AAAA', 'Cuenta con A')
+INSERT INTO cuenta (cue_numero, cue_subcuenta, cue_descripcion) VALUES ('BB', 'BBBB', 'Cuenta con B')
+INSERT INTO cuenta (cue_numero, cue_subcuenta, cue_descripcion) VALUES ('CC', 'CCCC', 'Cuenta con C')
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 1, GETDATE()))
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 2, GETDATE()))
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 3, GETDATE()))
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 4, GETDATE()))
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 5, GETDATE()))
+
+3.
+INSERT INTO movimiento (cue_numero, cue_subcuenta, mov_debito, mov_credito, mov_descripcion, mov_fecha)
+SELECT C.cue_numero, C.cue_subcuenta, 500, NULL, 'punto 3', F.fecha
+FROM cuenta C, #fecha F
+4.
+
+INSERT INTO cuenta (cue_numero, cue_subcuenta, cue_descripcion) VALUES ('DD', 'DDDD', 'Cuenta con D')
+INSERT INTO cuenta (cue_numero, cue_subcuenta, cue_descripcion) VALUES ('EE', 'EEEE', 'Cuenta con E')
+
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 6, GETDATE()))
+INSERT INTO #fecha (fecha) VALUES (DATEADD(day, 7, GETDATE()))
+5.
+INSERT INTO movimiento (cue_numero, cue_subcuenta, mov_debito, mov_credito, mov_descripcion, mov_fecha)
+SELECT C.cue_numero, C.cue_subcuenta, NULL, 275, 'punto 5', F.fecha
+FROM cuenta C, #fecha F
+6.
+INSERT INTO movimiento (cue_numero, cue_subcuenta, mov_debito, mov_credito, mov_descripcion, mov_fecha)
+SELECT C.cue_numero, C.cue_subcuenta, 15, NULL, 'punto 6', F.fecha
+FROM cuenta C, #fecha F
+7.
+ALTER TABLE resumen
+ADD total int
+
+8.
+INSERT INTO resumen (cue_numero, cue_subcuenta, res_debito, res_credito, total)
+SELECT cue_numero, cue_subcuenta, SUM(mov_debito), SUM(mov_credito), (SUM(mov_credito) - SUM(mov_debito)) AS diferencia
+FROM movimiento
+GROUP BY cue_numero, cue_subcuenta
+
+9.
+ALTER TABLE movimiento
+DROP COLUMN mov_descripcion
+
+10.
+DELETE FROM movimiento WHERE cue_numero = 'AA' AND cue_subcuenta = 'AAAA'
+DELETE FROM resumen WHERE cue_numero = 'AA' AND cue_subcuenta = 'AAAA'
+DELETE FROM cuenta WHERE cue_numero = 'AA' AND cue_subcuenta = 'AAAA'
